@@ -1,9 +1,16 @@
 package trafficlight.ctrl;
 
+import trafficlight.gui.IObserver;
+import trafficlight.gui.TrafficLight;
 import trafficlight.gui.TrafficLightGui;
 import trafficlight.states.State;
 
-public class TrafficLightCtrl {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TrafficLightCtrl implements ISubject {
+
+    private List<IObserver> observers = new ArrayList<>();
 
     private static TrafficLightCtrl trafficLightCtrl = null;
 
@@ -26,7 +33,7 @@ public class TrafficLightCtrl {
         initStates();
         gui = new TrafficLightGui(this);
         gui.setVisible(true);
-        //TODO useful to update the current state
+        this.notifyObservers();
     }
 
     public static TrafficLightCtrl getInstance() {
@@ -42,6 +49,7 @@ public class TrafficLightCtrl {
             @Override
             public State getNextState() {
                 previousState = currentState;
+
                 //TODO useful to update the current state and the old one
                 return yellowState;
             }
@@ -114,9 +122,31 @@ public class TrafficLightCtrl {
 
     public void nextState() {
         currentState = currentState.getNextState();
+        this.notifyObservers();
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 
     public void stop() {
         doRun = false;
+    }
+
+    @Override
+    public void add(IObserver observer) {
+        this.observers.add(observer);
+    }
+
+    @Override
+    public void remove(IObserver observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for(IObserver observer: observers){
+            observer.update();
+        }
     }
 }
