@@ -8,7 +8,7 @@ import trafficlight.states.State;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrafficLightCtrl implements ISubject {
+public class TrafficLightCtrl {
 
     private List<IObserver> observers = new ArrayList<>();
 
@@ -33,7 +33,7 @@ public class TrafficLightCtrl implements ISubject {
         initStates();
         gui = new TrafficLightGui(this);
         gui.setVisible(true);
-        this.notifyObservers();
+        this.getGreenState().notifyObservers();
     }
 
     public static TrafficLightCtrl getInstance() {
@@ -48,9 +48,9 @@ public class TrafficLightCtrl implements ISubject {
         greenState = new State() {
             @Override
             public State getNextState() {
+                currentState.notifyObservers();
                 previousState = currentState;
-
-                //TODO useful to update the current state and the old one
+                yellowState.notifyObservers();
                 return yellowState;
             }
             @Override
@@ -62,8 +62,9 @@ public class TrafficLightCtrl implements ISubject {
         redState = new State() {
             @Override
             public State getNextState() {
+                currentState.notifyObservers();
                 previousState = currentState;
-                //TODO useful to update the current state and the old one
+                yellowState.notifyObservers();
                 return yellowState;
             }
             @Override
@@ -76,12 +77,14 @@ public class TrafficLightCtrl implements ISubject {
             @Override
             public State getNextState() {
                 if (previousState.equals(greenState)) {
+                    currentState.notifyObservers();
                     previousState = currentState;
-                    //TODO useful to update the current state and the old one
+                    redState.notifyObservers();
                     return redState;
                 }else {
+                    currentState.notifyObservers();
                     previousState = currentState;
-                    //TODO useful to update the current state and the old one
+                    greenState.notifyObservers();
                     return greenState;
                 }
             }
@@ -122,7 +125,6 @@ public class TrafficLightCtrl implements ISubject {
 
     public void nextState() {
         currentState = currentState.getNextState();
-        this.notifyObservers();
     }
 
     public State getCurrentState() {
@@ -133,20 +135,4 @@ public class TrafficLightCtrl implements ISubject {
         doRun = false;
     }
 
-    @Override
-    public void add(IObserver observer) {
-        this.observers.add(observer);
-    }
-
-    @Override
-    public void remove(IObserver observer) {
-        this.observers.remove(observer);
-    }
-
-    @Override
-    public void notifyObservers() {
-        for(IObserver observer: observers){
-            observer.update();
-        }
-    }
 }

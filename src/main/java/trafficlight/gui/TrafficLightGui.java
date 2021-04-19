@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class TrafficLightGui extends JFrame implements ActionListener,IObserver {
+public class TrafficLightGui extends JFrame implements ActionListener {
 
     public static final String ACTION_COMMAND_STOP = "stop";
 
@@ -33,7 +33,10 @@ public class TrafficLightGui extends JFrame implements ActionListener,IObserver 
         this.green = new TrafficLight(new Color(50,205,50));
         this.yellow = new TrafficLight(new Color(255,255,0));
         this.red = new TrafficLight(new Color(255,0,0));
-        ctrl.add(this);
+        this.trafficLightCtrl.getGreenState().add(this.green);
+        this.trafficLightCtrl.getRedState().add(this.red);
+        this.trafficLightCtrl.getYellowState().add(this.yellow);
+
     }
 
     private void init() {
@@ -69,26 +72,4 @@ public class TrafficLightGui extends JFrame implements ActionListener,IObserver 
         }
     }
 
-    @Override
-    public void update() {
-        switch(this.trafficLightCtrl.getCurrentState().getColor()){
-            case "red":
-                this.red.turnOn(true);
-                this.yellow.turnOn(false);
-                this.green.turnOn(false);
-                break;
-
-            case "yellow":
-                this.red.turnOn(false);
-                this.yellow.turnOn(true);
-                this.green.turnOn(false);
-                break;
-
-            case "green":
-                this.red.turnOn(false);
-                this.yellow.turnOn(false);
-                this.green.turnOn(true);
-                break;
-        }
-    }
 }
